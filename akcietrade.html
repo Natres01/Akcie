@@ -11,9 +11,50 @@
     --border: #1e2230; --accent: #4080ff; --accent2: #00d68f;
     --danger: #ff4060; --warn: #ffaa33; --muted: #5a6380;
     --text: #dde3f0; --gold: #c9963a;
+    /* PDF light theme */
+    --pdf-bg: #ffffff; --pdf-surface: #f4f6fb; --pdf-surface2: #eaf0ff;
+    --pdf-border: #d0d8e8; --pdf-text: #1a1e2e; --pdf-muted: #5a6380;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; }
+
+  /* ── PDF LIGHT THEME ── applied to #pdf-report when generating PDF */
+  #pdf-report.pdf-light { background: var(--pdf-bg) !important; color: var(--pdf-text) !important; }
+  #pdf-report.pdf-light .company-name { color: #1a1e2e !important; }
+  #pdf-report.pdf-light .pdf-logo { color: #1a1e2e !important; }
+  #pdf-report.pdf-light .pdf-date { color: #5a6380 !important; }
+  #pdf-report.pdf-light .company-badge { background: var(--pdf-surface2) !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .sector-tag { color: #5a6380 !important; }
+  #pdf-report.pdf-light .metric-card { background: var(--pdf-surface) !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .metric-label { color: #5a6380 !important; }
+  #pdf-report.pdf-light .metric-val { color: #1a1e2e !important; }
+  #pdf-report.pdf-light .sec-title { border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .company-hdr { border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .pdf-header { border-color: #4080ff !important; }
+  #pdf-report.pdf-light .box { background: var(--pdf-surface) !important; border-color: var(--pdf-border) !important; color: #2a3050 !important; }
+  #pdf-report.pdf-light .swot-card { background: var(--pdf-surface) !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .swot-label { border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .swot-item { color: #2a3050 !important; border-color: rgba(0,0,0,0.06) !important; }
+  #pdf-report.pdf-light .ind-row { background: var(--pdf-surface) !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .ind-name { color: #1a1e2e !important; }
+  #pdf-report.pdf-light .ind-val { color: #5a6380 !important; }
+  #pdf-report.pdf-light .score-block { background: var(--pdf-surface) !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .score-info { color: #1a1e2e !important; }
+  #pdf-report.pdf-light .score-info div { color: #2a3050 !important; }
+  #pdf-report.pdf-light .score-bar-wrap { background: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .screening-box { background: var(--pdf-surface) !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .screen-row { border-color: rgba(0,0,0,0.06) !important; }
+  #pdf-report.pdf-light .screen-label { color: #2a3050 !important; }
+  #pdf-report.pdf-light .fair-value { background: var(--pdf-surface2) !important; }
+  #pdf-report.pdf-light .add-metric { background: var(--pdf-surface) !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .add-metric-label { color: #5a6380 !important; }
+  #pdf-report.pdf-light .add-metric-val { color: #1a1e2e !important; }
+  #pdf-report.pdf-light .verdict-box { background: var(--pdf-surface2) !important; border-color: #4080ff !important; }
+  #pdf-report.pdf-light .verdict-text { color: #2a3050 !important; }
+  #pdf-report.pdf-light .disclaimer { color: #5a6380 !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .badge-ok   { background: rgba(0,180,100,0.15) !important; }
+  #pdf-report.pdf-light .badge-bad  { background: rgba(220,50,80,0.12) !important; }
+  #pdf-report.pdf-light .badge-warn { background: rgba(200,140,0,0.12) !important; }
 
   /* HEADER */
   .hdr { display:flex; align-items:center; justify-content:space-between; padding:15px 32px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(11,13,18,0.97); backdrop-filter:blur(10px); z-index:100; }
@@ -404,21 +445,28 @@ function downloadPDF() {
   const el = document.getElementById('pdf-report');
   const ticker = reportData?.ticker || 'analyza';
   const date = new Date().toISOString().slice(0,10);
+
+  // Apply light theme for PDF
+  el.classList.add('pdf-light');
+
   const opt = {
-    margin: [8,8,8,8],
+    margin: [10,10,10,10],
     filename: `analyza-${ticker}-${date}.pdf`,
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0b0d12' },
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
-  // Show loading state
+
   const btn = event.currentTarget;
   btn.textContent = '⏳ Generuji PDF...';
   btn.disabled = true;
+
   html2pdf().set(opt).from(el).save().then(() => {
+    el.classList.remove('pdf-light');
     btn.innerHTML = '⬇ Stáhnout PDF';
     btn.disabled = false;
   }).catch(() => {
+    el.classList.remove('pdf-light');
     btn.innerHTML = '⬇ Stáhnout PDF';
     btn.disabled = false;
     window.print();
