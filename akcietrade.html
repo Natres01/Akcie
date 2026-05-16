@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AkcieTrade — Fundamentální analýza akcií</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0d12; --surface: #111318; --surface2: #181b22;
+    --border: #1e2230; --accent: #4080ff; --accent2: #00d68f;
+    --danger: #ff4060; --warn: #ffaa33; --muted: #5a6380;
+    --text: #dde3f0; --gold: #c9963a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; }
+
+  /* HEADER */
+  .hdr { display:flex; align-items:center; justify-content:space-between; padding:15px 32px; border-bottom:1px solid var(--border); position:sticky; top:0; background:rgba(11,13,18,0.97); backdrop-filter:blur(10px); z-index:100; }
+  .logo { font-size:1.3rem; font-weight:900; }
+  .logo span { color:var(--accent); }
+  .btn-back { background:transparent; color:var(--muted); border:1px solid var(--border); border-radius:8px; padding:6px 14px; cursor:pointer; font-size:0.8rem; }
+  .btn-back:hover { color:var(--text); border-color:var(--text); }
+
+  /* HOME */
+  #view-home { max-width:620px; margin:0 auto; padding:60px 28px 40px; text-align:center; }
+  .home-title { font-size:clamp(1.7rem,3.5vw,2.6rem); font-weight:900; line-height:1.15; margin-bottom:12px; background:linear-gradient(135deg,#dde3f0 40%,#4080ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .home-sub { color:var(--muted); font-size:0.93rem; margin-bottom:44px; line-height:1.65; }
+  .step { background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:18px 22px; margin-bottom:12px; text-align:left; }
+  .step-num { width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.82rem; flex-shrink:0; }
+  .step-row { display:flex; align-items:center; gap:11px; margin-bottom:6px; }
+  .step-desc { color:var(--muted); font-size:0.85rem; line-height:1.6; margin-left:37px; }
+  code { background:var(--surface2); border:1px solid var(--border); border-radius:5px; padding:1px 9px; font-family:monospace; color:var(--text); font-size:0.83rem; }
+
+  /* PASTE */
+  #view-paste { max-width:660px; margin:0 auto; padding:44px 28px; }
+  textarea { width:100%; height:300px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; color:var(--text); font-family:monospace; font-size:0.82rem; resize:vertical; outline:none; line-height:1.6; }
+  textarea:focus { border-color:var(--accent); }
+  .err { color:var(--danger); font-size:0.84rem; margin-top:8px; }
+
+  /* BUTTONS */
+  .btn-primary { background:var(--accent); color:#fff; border:none; border-radius:10px; padding:13px 26px; font-weight:700; font-size:0.92rem; cursor:pointer; }
+  .btn-primary:hover { background:#5590ff; }
+  .btn-full { width:100%; margin-top:14px; padding:13px 0; }
+  .btn-pdf { display:flex; align-items:center; gap:8px; background:var(--accent2); color:#000; border:none; border-radius:9px; padding:10px 22px; font-weight:700; font-size:0.88rem; cursor:pointer; }
+  .btn-pdf:hover { background:#00f5a0; }
+
+  /* REPORT WRAPPER */
+  #view-report { padding:12px 0 0; }
+  .report-toolbar { max-width:860px; margin:0 auto; padding:0 28px 12px; display:flex; justify-content:flex-end; gap:10px; }
+
+  /* PDF CONTENT */
+  #pdf-report { max-width:860px; margin:0 auto; padding:24px 32px 48px; }
+  .pdf-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid var(--accent); }
+  .pdf-logo { font-size:1.3rem; font-weight:900; }
+  .pdf-logo span { color:var(--accent); }
+  .pdf-logo small { font-size:0.68rem; color:var(--muted); margin-left:10px; font-weight:400; letter-spacing:1px; }
+  .pdf-date { font-size:0.7rem; color:var(--muted); text-align:right; }
+
+  /* COMPANY HEADER */
+  .company-badge { display:inline-flex; align-items:center; gap:8px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:4px 12px; margin-bottom:11px; }
+  .dot { width:6px; height:6px; background:var(--accent2); border-radius:50%; }
+  .ticker { font-family:monospace; font-size:0.78rem; font-weight:700; color:var(--accent); letter-spacing:1px; }
+  .sector-tag { color:var(--muted); font-size:0.74rem; }
+  .company-name { font-size:1.7rem; font-weight:900; line-height:1.2; margin-bottom:14px; }
+  .metrics-row { display:flex; flex-wrap:wrap; gap:8px; }
+  .metric-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:7px 13px; }
+  .metric-label { font-size:0.56rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:2px; }
+  .metric-val { font-family:monospace; font-size:0.86rem; font-weight:600; }
+
+  /* SECTION */
+  .sec { margin-bottom:26px; }
+  .sec-title { font-size:0.98rem; font-weight:700; color:var(--accent); margin-bottom:10px; padding-bottom:7px; border-bottom:1px solid var(--border); }
+
+  /* BOXES */
+  .box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 18px; line-height:1.7; color:#aab4cc; font-size:0.88rem; }
+
+  /* SWOT */
+  .swot-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .swot-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:13px 15px; }
+  .swot-label { font-size:0.58rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .swot-item { font-size:0.82rem; color:#aab4cc; padding:3px 0; line-height:1.5; }
+  .swot-item:not(:last-child) { border-bottom:1px solid rgba(255,255,255,0.05); }
+
+  /* INDICATORS */
+  .ind-row { display:flex; align-items:center; justify-content:space-between; background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:10px 15px; margin-bottom:6px; }
+  .ind-left { display:flex; align-items:center; gap:8px; }
+  .ind-name { font-weight:500; font-size:0.86rem; }
+  .ind-val { font-family:monospace; font-size:0.8rem; color:var(--muted); }
+  .badge { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:800; flex-shrink:0; }
+  .badge-ok   { background:rgba(0,214,143,0.15); color:var(--accent2); }
+  .badge-bad  { background:rgba(255,64,96,0.15);  color:var(--danger); }
+  .badge-warn { background:rgba(255,170,51,0.15); color:var(--warn); }
+
+  /* SCORE */
+  .score-block { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 22px; display:flex; align-items:center; gap:18px; }
+  .score-num { font-size:3rem; font-weight:900; line-height:1; min-width:56px; text-align:center; }
+  .score-info { flex:1; }
+  .score-bar-wrap { width:100%; height:5px; background:var(--border); border-radius:3px; margin-top:10px; overflow:hidden; }
+  .score-bar { height:100%; border-radius:3px; background:linear-gradient(90deg,#ff4060,#ffaa33,#00d68f); }
+
+  /* SCREENING */
+  .screening-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 20px; }
+  .screen-row { display:flex; align-items:center; gap:10px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.86rem; }
+  .screen-row:last-child { border:none; }
+  .screen-label { color:#aab4cc; flex:1; }
+  .screen-result { font-weight:700; margin-left:auto; }
+  .fair-value { margin-top:12px; padding:10px 14px; background:var(--surface2); border-radius:8px; font-size:0.82rem; color:var(--gold); }
+
+  /* ADDITIONAL METRICS */
+  .add-metrics { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:8px; }
+  .add-metric { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 12px; }
+  .add-metric-label { font-size:0.56rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px; }
+  .add-metric-val { font-size:0.82rem; font-weight:600; color:var(--text); line-height:1.4; }
+
+  /* TWO COL */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  /* VERDICT */
+  .verdict-box { background:var(--surface2); border:1px solid var(--accent); border-radius:12px; padding:18px 22px; }
+  .verdict-title { font-size:0.58rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin-bottom:8px; }
+  .verdict-text { color:#aab4cc; font-size:0.88rem; line-height:1.75; }
+
+  /* DISCLAIMER */
+  .disclaimer { text-align:center; color:var(--muted); font-size:0.65rem; margin-top:20px; padding-top:14px; border-top:1px solid var(--border); line-height:1.6; }
+
+  /* COMPANY HEADER separator */
+  .company-hdr { margin-bottom:26px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+
+  /* HIDDEN */
+  .hidden { display:none !important; }
+
+  /* PRINT */
+  @media print {
+    .no-print { display:none !important; }
+    body { background:#0b0d12; }
+    #pdf-report { max-width:100%; padding:10px 20px; }
+    * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+    @page { margin:10mm; size:A4; }
+    .swot-grid, .two-col { grid-template-columns:1fr 1fr; }
+    .add-metrics { grid-template-columns:repeat(3,1fr); }
+  }
+
+  @media (max-width:600px) {
+    .swot-grid, .two-col { grid-template-columns:1fr; }
+    #view-home, #view-paste, #view-report { padding-left:16px; padding-right:16px; }
+    .hdr { padding:12px 16px; }
+    .report-toolbar { padding:0 16px 12px; }
+    #pdf-report { padding:16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr no-print">
+  <div class="logo">Akcie<span>Trade</span></div>
+  <button class="btn-back hidden" id="btn-back" onclick="goBack()">← Zpět</button>
+</div>
+
+<!-- VIEW: HOME -->
+<div id="view-home">
+  <div class="home-title">Analýza akcií<br>fundamentální přístup</div>
+  <div class="home-sub">Napište ticker do chatu — Claude vyhledá aktuální tržní data a vytvoří kompletní JSON analýzu. Tu pak stačí vložit sem.</div>
+
+  <div class="step">
+    <div class="step-row"><div class="step-num">1</div><strong>Požádejte Claude o analýzu</strong></div>
+    <div class="step-desc">Napište do chatu: <code>Analyzuj akcii NVDA</code></div>
+  </div>
+  <div class="step">
+    <div class="step-row"><div class="step-num">2</div><strong>Zkopírujte JSON z odpovědi</strong></div>
+    <div class="step-desc">Claude vrátí strukturovaný JSON se všemi daty — zkopírujte celou odpověď.</div>
+  </div>
+  <div class="step">
+    <div class="step-row"><div class="step-num">3</div><strong>Vložte sem → report + PDF</strong></div>
+    <div class="step-desc">Aplikace JSON najde automaticky, zobrazí profesionální report a umožní stažení jako PDF.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:28px;">
+    <button class="btn-primary" onclick="showView('paste')">Vložit JSON analýzu →</button>
+  </div>
+</div>
+
+<!-- VIEW: PASTE -->
+<div id="view-paste" class="hidden">
+  <div style="padding-top:44px;">
+    <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:7px;">Vložte JSON analýzy</h2>
+    <p style="color:var(--muted);font-size:0.87rem;margin-bottom:20px;line-height:1.6;">
+      Zkopírujte celou odpověď od Claude a vložte sem. Aplikace JSON najde automaticky.
+    </p>
+    <textarea id="json-input" placeholder='&#123;
+  "companyName": "Duolingo, Inc.",
+  "ticker": "DUOL",
+  ...
+&#125;'></textarea>
+    <div id="parse-err" class="err hidden"></div>
+    <button class="btn-primary btn-full" onclick="parseAndShow()">Zobrazit report →</button>
+  </div>
+</div>
+
+<!-- VIEW: REPORT -->
+<div id="view-report" class="hidden">
+  <div class="report-toolbar no-print">
+    <button class="btn-pdf" onclick="downloadPDF()">⬇ Stáhnout PDF</button>
+  </div>
+  <div id="pdf-report">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<script>
+// ── State ───────────────────────────────────────────────────────
+let currentView = 'home';
+let reportData = null;
+
+// ── Navigation ─────────────────────────────────────────────────
+function showView(v) {
+  ['home','paste','report'].forEach(x => {
+    document.getElementById('view-'+x).classList.toggle('hidden', x !== v);
+  });
+  const backBtn = document.getElementById('btn-back');
+  if (v === 'paste')  { backBtn.classList.remove('hidden'); backBtn.onclick = () => showView('home'); }
+  else if (v === 'report') { backBtn.classList.remove('hidden'); backBtn.onclick = () => showView('paste'); }
+  else { backBtn.classList.add('hidden'); }
+  currentView = v;
+  window.scrollTo(0,0);
+}
+
+function goBack() {
+  if (currentView === 'paste') showView('home');
+  else if (currentView === 'report') showView('paste');
+}
+
+// ── Parse JSON ─────────────────────────────────────────────────
+function parseAndShow() {
+  const raw = document.getElementById('json-input').value;
+  const errEl = document.getElementById('parse-err');
+  errEl.classList.add('hidden');
+  try {
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}');
+    if (s === -1) throw new Error('Text neobsahuje JSON objekt.');
+    const d = JSON.parse(raw.slice(s, e+1));
+    if (!d.companyName) throw new Error('JSON nemá pole companyName.');
+    reportData = d;
+    renderReport(d);
+    showView('report');
+  } catch(err) {
+    errEl.textContent = '⚠️ ' + err.message;
+    errEl.classList.remove('hidden');
+  }
+}
+
+// ── Helpers ─────────────────────────────────────────────────────
+function esc(s) {
+  if (s == null) return '—';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function badge(status) {
+  const map = { ok:'badge-ok', bad:'badge-bad', warn:'badge-warn' };
+  const icon = { ok:'✓', bad:'✗', warn:'!' };
+  const cls = map[status] || 'badge-warn';
+  return `<div class="badge ${cls}">${icon[status]||'!'}</div>`;
+}
+
+function sec(title, content) {
+  return `<div class="sec"><div class="sec-title">${esc(title)}</div>${content}</div>`;
+}
+
+function metricCard(label, val) {
+  return `<div class="metric-card"><div class="metric-label">${esc(label)}</div><div class="metric-val">${esc(val)||'—'}</div></div>`;
+}
+
+function swotCard(title, items, color) {
+  const rows = (items||[]).map(x => `<div class="swot-item">${esc(x)}</div>`).join('');
+  return `<div class="swot-card"><div class="swot-label" style="color:${color}">${esc(title)}</div>${rows}</div>`;
+}
+
+// ── Render Report ───────────────────────────────────────────────
+function renderReport(d) {
+  const today = new Date().toLocaleDateString('cs-CZ');
+  const pct = (((d.valueScore||1)-1)/5*100).toFixed(0);
+  const sc = d.valueScore<=2 ? 'var(--danger)' : d.valueScore<=4 ? 'var(--warn)' : 'var(--accent2)';
+  const m = d.metrics || {};
+
+  let html = `
+    <!-- PDF Header -->
+    <div class="pdf-header">
+      <div class="pdf-logo">Akcie<span>Trade</span><small>FUNDAMENTÁLNÍ ANALÝZA</small></div>
+      <div class="pdf-date">${today}<br>Claude AI</div>
+    </div>
+
+    <!-- Company Header -->
+    <div class="company-hdr">
+      <div class="company-badge">
+        <div class="dot"></div>
+        <span class="ticker">${esc(d.ticker)}</span>
+        <span class="sector-tag">${esc(d.sector)}</span>
+      </div>
+      <div class="company-name">${esc(d.companyName)}</div>
+      <div class="metrics-row">
+        ${metricCard('Cena akcie', m.price)}
+        ${metricCard('Tržní kap.', m.marketCap)}
+        ${metricCard('Beta', m.beta)}
+        ${metricCard('P/E', m.pe)}
+        ${metricCard('P/B', m.pb)}
+        ${metricCard('Dividenda', m.dividend||'nevyplácí')}
+      </div>
+    </div>
+
+    <!-- Popis -->
+    ${sec('Představení společnosti', `<div class="box">${esc(d.description)}</div>`)}
+
+    <!-- SWOT -->
+    ${sec('SWOT Analýza', `
+      <div class="swot-grid">
+        ${swotCard('Silné stránky', d.swot?.strengths, 'var(--accent2)')}
+        ${swotCard('Slabé stránky', d.swot?.weaknesses, 'var(--danger)')}
+        ${swotCard('Příležitosti', d.swot?.opportunities, 'var(--accent)')}
+        ${swotCard('Hrozby', d.swot?.threats, 'var(--warn)')}
+      </div>
+    `)}
+
+    <!-- Klíčové ukazatele -->
+    ${sec('Klíčové ukazatele', (d.keyIndicators||[]).map(ind => `
+      <div class="ind-row">
+        <div class="ind-left">${badge(ind.status)}<span class="ind-name">${esc(ind.name)}</span></div>
+        <span class="ind-val">${esc(ind.value)}</span>
+      </div>
+    `).join(''))}
+
+    <!-- Score -->
+    ${sec('Hodnocení hodnoty', `
+      <div class="score-block">
+        <div class="score-num" style="color:${sc}">${d.valueScore||'—'}</div>
+        <div class="score-info">
+          <strong>Hodnocení screeningu: <span style="color:${sc}">${d.valueScore} / 6</span></strong>
+          <div style="color:#aab4cc;font-size:0.84rem;margin-top:5px;line-height:1.5">${esc(d.scoreReason)}</div>
+          <div style="font-size:0.66rem;color:var(--muted);margin-top:3px">1 = nevhodná k nákupu · 6 = vysoce vhodná k nákupu</div>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:${pct}%"></div></div>
+        </div>
+      </div>
+    `)}
+
+    <!-- Technická analýza -->
+    ${sec('Technická analýza akcie', `<div class="box">${esc(d.technicalAnalysis)}</div>`)}
+
+    <!-- Příležitosti & Rizika -->
+    ${sec('Příležitosti a rizika do budoucna', `
+      <div class="two-col">
+        ${swotCard('Příležitosti', d.opportunities, 'var(--accent2)')}
+        ${swotCard('Rizika', d.risks, 'var(--danger)')}
+      </div>
+    `)}
+  `;
+
+  // Hodnotový screening
+  if (d.valuationScreening) {
+    const vs = d.valuationScreening;
+    const rows = [
+      ['P/E ratio nižší než 15?', vs.pe_ok],
+      ['P/B ratio nižší než 1,5?', vs.pb_ok],
+      ['Zisková společnost?', vs.profitable],
+      ['Current ratio vyšší než 2?', vs.current_ratio_ok],
+      ['Debt/Equity nižší než 0,6?', vs.debt_equity_ok],
+      ['Vyplácí dividendu?', vs.dividend_ok],
+    ].map(([label, ok]) => `
+      <div class="screen-row">
+        <span>${ok ? '✅' : '❌'}</span>
+        <span class="screen-label">${esc(label)}</span>
+        <span class="screen-result" style="color:${ok ? 'var(--accent2)':'var(--danger)'}">${ok ? 'ANO' : 'NE'}</span>
+      </div>
+    `).join('');
+    const fv = vs.fairValue ? `<div class="fair-value">💡 Vnitřní hodnota (férová cena): <strong>${esc(vs.fairValue)}</strong></div>` : '';
+    html += sec('Hodnotový screening', `<div class="screening-box">${rows}${fv}</div>`);
+  }
+
+  // Dodatečné metriky
+  if (d.additionalMetrics) {
+    const cards = Object.entries(d.additionalMetrics).map(([k,v]) => `
+      <div class="add-metric">
+        <div class="add-metric-label">${esc(k)}</div>
+        <div class="add-metric-val">${esc(v)}</div>
+      </div>
+    `).join('');
+    html += sec('Klíčové finanční metriky', `<div class="add-metrics">${cards}</div>`);
+  }
+
+  // Závěr
+  html += sec('Závěr', `
+    <div class="verdict-box">
+      <div class="verdict-title">Celkové hodnocení</div>
+      <div class="verdict-text">${esc(d.verdict)}</div>
+    </div>
+  `);
+
+  html += `<div class="disclaimer">⚠️ Tato analýza slouží pouze jako informační materiál a nepředstavuje investiční poradenství.<br>AkcieTrade · Claude AI · ${today}</div>`;
+
+  document.getElementById('pdf-report').innerHTML = html;
+}
+
+// ── PDF Download ────────────────────────────────────────────────
+function downloadPDF() {
+  const el = document.getElementById('pdf-report');
+  const ticker = reportData?.ticker || 'analyza';
+  const date = new Date().toISOString().slice(0,10);
+  const opt = {
+    margin: [8,8,8,8],
+    filename: `analyza-${ticker}-${date}.pdf`,
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0b0d12' },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  // Show loading state
+  const btn = event.currentTarget;
+  btn.textContent = '⏳ Generuji PDF...';
+  btn.disabled = true;
+  html2pdf().set(opt).from(el).save().then(() => {
+    btn.innerHTML = '⬇ Stáhnout PDF';
+    btn.disabled = false;
+  }).catch(() => {
+    btn.innerHTML = '⬇ Stáhnout PDF';
+    btn.disabled = false;
+    window.print();
+  });
+}
+
+// Enter key in textarea
+document.getElementById('json-input').addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 'Enter') parseAndShow();
+});
+</script>
+</body>
+</html>
