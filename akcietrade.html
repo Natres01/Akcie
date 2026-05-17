@@ -177,39 +177,41 @@
   @media print {
     .no-print { display:none !important; }
     body { background:#fff; }
-    #pdf-report { max-width:100%; padding:6px 16px; font-size:11px; }
+    #pdf-report { max-width:100%; padding:6px 16px; font-size:10px; }
     * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
-    @page { margin:12mm 10mm; size:A4; }
+    @page { margin:10mm 8mm; size:A4; }
     .swot-grid, .two-col { grid-template-columns:1fr 1fr; }
     .add-metrics { grid-template-columns:repeat(3,1fr); }
-    /* Prevent page breaks inside key elements */
-    .sec { page-break-inside:avoid; break-inside:avoid; }
-    .swot-card { page-break-inside:avoid; break-inside:avoid; }
-    .ind-row { page-break-inside:avoid; break-inside:avoid; }
-    .score-block { page-break-inside:avoid; break-inside:avoid; }
-    .verdict-box { page-break-inside:avoid; break-inside:avoid; }
-    .screening-box { page-break-inside:avoid; break-inside:avoid; }
-    .metric-card { page-break-inside:avoid; break-inside:avoid; }
-    .add-metric { page-break-inside:avoid; break-inside:avoid; }
-    /* Keep section title with content */
     .sec-title { page-break-after:avoid; break-after:avoid; }
     .swot-label { page-break-after:avoid; break-after:avoid; }
-    /* Reduce font sizes for PDF */
-    .box { font-size:0.78rem !important; line-height:1.5 !important; padding:10px 14px !important; }
-    .swot-item { font-size:0.75rem !important; }
-    .ind-name { font-size:0.78rem !important; }
-    .ind-val { font-size:0.72rem !important; }
-    .screen-row { font-size:0.78rem !important; }
-    .verdict-text { font-size:0.78rem !important; line-height:1.55 !important; }
-    .company-name { font-size:1.4rem !important; }
-    .sec-title { font-size:0.88rem !important; }
-    .score-num { font-size:2.4rem !important; }
-    .metric-val { font-size:0.78rem !important; }
-    .add-metric-val { font-size:0.75rem !important; }
-    .score-block { padding:12px 16px !important; }
-    .sec { margin-bottom:16px !important; }
-    .company-hdr { margin-bottom:16px !important; padding-bottom:14px !important; }
-    .fair-value { font-size:0.75rem !important; }
+    .box { font-size:0.74rem !important; line-height:1.45 !important; padding:8px 12px !important; }
+    .swot-item { font-size:0.72rem !important; padding:2px 0 !important; }
+    .ind-name { font-size:0.74rem !important; }
+    .ind-val { font-size:0.68rem !important; }
+    .screen-row { font-size:0.74rem !important; padding:3px 0 !important; }
+    .verdict-text { font-size:0.74rem !important; line-height:1.5 !important; }
+    .company-name { font-size:1.3rem !important; }
+    .sec-title { font-size:0.85rem !important; margin-bottom:7px !important; padding-bottom:5px !important; }
+    .score-num { font-size:2.2rem !important; }
+    .metric-val { font-size:0.74rem !important; }
+    .add-metric-val { font-size:0.7rem !important; }
+    .add-metric-label { font-size:0.52rem !important; }
+    .score-block { padding:10px 14px !important; gap:14px !important; }
+    .sec { margin-bottom:12px !important; }
+    .company-hdr { margin-bottom:12px !important; padding-bottom:10px !important; }
+    .fair-value { font-size:0.7rem !important; padding:7px 10px !important; }
+    .ind-row { padding:7px 12px !important; margin-bottom:4px !important; }
+    .metric-card { padding:5px 10px !important; }
+    .screening-box { padding:10px 14px !important; }
+    .swot-card { padding:10px 12px !important; }
+    .verdict-box { padding:12px 16px !important; }
+    .verdict-title { margin-bottom:5px !important; }
+    .score-info div { font-size:0.72rem !important; }
+    .pdf-header { margin-bottom:12px !important; padding-bottom:10px !important; }
+    .pdf-logo small { font-size:0.6rem !important; }
+    .pdf-date { font-size:0.62rem !important; }
+    .metrics-row { gap:5px !important; }
+    .disclaimer { margin-top:12px !important; padding-top:10px !important; font-size:0.6rem !important; }
   }
 
 
@@ -453,7 +455,9 @@ function renderReport(d) {
 
   // Dodatečné metriky
   if (d.additionalMetrics) {
-    const cards = Object.entries(d.additionalMetrics).map(([k,v]) => `
+    const cards = Object.entries(d.additionalMetrics)
+      .filter(([k,v]) => v != null && String(v).trim() !== '')
+      .map(([k,v]) => `
       <div class="add-metric">
         <div class="add-metric-label">${esc(k)}</div>
         <div class="add-metric-val">${esc(v)}</div>
@@ -486,11 +490,12 @@ function downloadPDF() {
   // Hide interactive chart for PDF (use static placeholder)
 
   const opt = {
-    margin: [10,10,10,10],
+    margin: [8,6,8,6],
     filename: `analyza-${ticker}-${date}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false, removeContainer: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    image: { type: 'jpeg', quality: 0.97 },
+    html2canvas: { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false, removeContainer: true, windowWidth: 900 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.page-break', avoid: ['.sec', '.swot-card', '.ind-row', '.score-block', '.verdict-box', '.screening-box', '.swot-grid', '.two-col', '.add-metrics', '.company-hdr', '.box'] }
   };
 
   const btn = event.currentTarget;
