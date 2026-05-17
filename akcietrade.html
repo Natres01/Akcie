@@ -115,13 +115,13 @@
   .sec-title { font-size:0.98rem; font-weight:700; color:var(--accent); margin-bottom:10px; padding-bottom:7px; border-bottom:1px solid var(--border); }
 
   /* BOXES */
-  .box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 18px; line-height:1.7; color:#aab4cc; font-size:0.88rem; }
+  .box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 18px; line-height:1.7; color:var(--text-secondary, #bbc4d8); font-size:0.88rem; }
 
   /* SWOT */
   .swot-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .swot-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:13px 15px; }
   .swot-label { font-size:0.58rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
-  .swot-item { font-size:0.82rem; color:#aab4cc; padding:3px 0; line-height:1.5; }
+  .swot-item { font-size:0.82rem; color:var(--text-secondary, #bbc4d8); padding:3px 0; line-height:1.5; }
   .swot-item:not(:last-child) { border-bottom:1px solid rgba(255,255,255,0.05); }
 
   /* INDICATORS */
@@ -138,6 +138,9 @@
   .score-block { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 22px; display:flex; align-items:center; gap:18px; }
   .score-num { font-size:3rem; font-weight:900; line-height:1; min-width:56px; text-align:center; }
   .score-info { flex:1; }
+  .score-heading { color:var(--text); font-size:0.88rem; }
+  .score-reason { color:#bbc4d8; font-size:0.84rem; margin-top:5px; line-height:1.5; }
+  .score-scale { font-size:0.66rem; color:var(--muted); margin-top:3px; }
   .score-bar-wrap { width:100%; height:5px; background:var(--border); border-radius:3px; margin-top:10px; overflow:hidden; }
   .score-bar { height:100%; border-radius:3px; background:linear-gradient(90deg,#ff4060,#ffaa33,#00d68f); }
 
@@ -145,7 +148,7 @@
   .screening-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 20px; }
   .screen-row { display:flex; align-items:center; gap:10px; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.86rem; }
   .screen-row:last-child { border:none; }
-  .screen-label { color:#aab4cc; flex:1; }
+  .screen-label { color:var(--text-secondary, #bbc4d8); flex:1; }
   .screen-result { font-weight:700; margin-left:auto; }
   .fair-value { margin-top:12px; padding:10px 14px; background:var(--surface2); border-radius:8px; font-size:0.82rem; color:var(--gold); }
 
@@ -161,7 +164,7 @@
   /* VERDICT */
   .verdict-box { background:var(--surface2); border:1px solid var(--accent); border-radius:12px; padding:18px 22px; }
   .verdict-title { font-size:0.58rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin-bottom:8px; }
-  .verdict-text { color:#aab4cc; font-size:0.88rem; line-height:1.75; }
+  .verdict-text { color:var(--text-secondary, #bbc4d8); font-size:0.88rem; line-height:1.75; }
 
   /* DISCLAIMER */
   .disclaimer { text-align:center; color:var(--muted); font-size:0.65rem; margin-top:20px; padding-top:14px; border-top:1px solid var(--border); line-height:1.6; }
@@ -411,9 +414,9 @@ function renderReport(d) {
       <div class="score-block">
         <div class="score-num" style="color:${sc}">${d.valueScore||'—'}</div>
         <div class="score-info">
-          <strong>Hodnocení screeningu: <span style="color:${sc}">${d.valueScore} / 6</span></strong>
-          <div style="color:#aab4cc;font-size:0.84rem;margin-top:5px;line-height:1.5">${esc(d.scoreReason)}</div>
-          <div style="font-size:0.66rem;color:var(--muted);margin-top:3px">1 = nevhodná k nákupu · 6 = vysoce vhodná k nákupu</div>
+          <strong class="score-heading">Hodnocení screeningu: <span style="color:${sc}">${d.valueScore} / 6</span></strong>
+          <div class="score-reason">${esc(d.scoreReason)}</div>
+          <div class="score-scale">1 = nevhodná k nákupu · 6 = vysoce vhodná k nákupu</div>
           <div class="score-bar-wrap"><div class="score-bar" style="width:${pct}%"></div></div>
         </div>
       </div>
@@ -522,8 +525,9 @@ function downloadPDF() {
     .score-block { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; page-break-inside: avoid; }
     .score-num { font-size: 2.4rem; font-weight: 900; line-height: 1; min-width: 46px; text-align: center; }
     .score-info { flex: 1; }
-    .score-info strong { color: #1a1e2e !important; font-size: 0.82rem; }
-    .score-info div { color: #2a3050 !important; font-size: 0.74rem; line-height: 1.5; margin-top: 3px; }
+    .score-heading { color: #1a1e2e !important; font-size: 0.82rem; }
+    .score-reason { color: #1a1e2e !important; font-size: 0.74rem !important; line-height: 1.5 !important; margin-top: 3px !important; }
+    .score-scale { color: #444 !important; font-size: 0.66rem !important; }
     .score-bar-wrap { width: 100%; height: 4px; background: #d0d8e8; border-radius: 2px; margin-top: 8px; overflow: hidden; }
     .score-bar { height: 100%; border-radius: 2px; background: linear-gradient(90deg,#cc2040,#cc8800,#00a870); }
     .screening-box { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 8px; padding: 10px 14px; page-break-inside: avoid; }
