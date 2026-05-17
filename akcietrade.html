@@ -490,26 +490,26 @@ function downloadPDF() {
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; color: #1a1e2e; padding: 12mm 10mm; font-size: 10pt; }
     .pdf-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid #4080ff; }
     .pdf-logo { font-size: 1.2rem; font-weight: 900; } .pdf-logo span { color: #4080ff; }
-    .pdf-logo small { font-size: 0.6rem; color: #888; margin-left: 8px; font-weight: 400; letter-spacing: 1px; }
-    .pdf-date { font-size: 0.65rem; color: #888; text-align: right; }
+    .pdf-logo small { font-size: 0.6rem; color: #555; margin-left: 8px; font-weight: 400; letter-spacing: 1px; }
+    .pdf-date { font-size: 0.65rem; color: #555; text-align: right; }
     .company-badge { display: inline-flex; align-items: center; gap: 6px; background: #eef2ff; border: 1px solid #c8d4f0; border-radius: 6px; padding: 3px 10px; margin-bottom: 8px; }
     .dot { width: 5px; height: 5px; background: #00a870; border-radius: 50%; }
     .ticker { font-family: monospace; font-size: 0.75rem; font-weight: 700; color: #2060cc; letter-spacing: 1px; }
-    .sector-tag { color: #888; font-size: 0.7rem; }
+    .sector-tag { color: #555; font-size: 0.7rem; }
     .company-name { font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; color: #1a1e2e; }
     .company-hdr { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #d0d8e8; }
     .metrics-row { display: flex; flex-wrap: wrap; gap: 6px; }
     .metric-card { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 6px; padding: 5px 10px; }
-    .metric-label { font-size: 0.52rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1px; }
+    .metric-label { font-size: 0.52rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1px; }
     .metric-val { font-family: monospace; font-size: 0.78rem; font-weight: 600; color: #1a1e2e; }
     .sec { margin-bottom: 14px; page-break-inside: avoid; }
     .sec-title { font-size: 0.88rem; font-weight: 700; color: #4080ff; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #d0d8e8; page-break-after: avoid; }
-    .box { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 8px; padding: 10px 12px; line-height: 1.55; color: #2a3050; font-size: 0.8rem; page-break-inside: avoid; }
+    .box { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 8px; padding: 10px 12px; line-height: 1.55; color: #1a1e2e; font-size: 0.8rem; page-break-inside: avoid; }
     .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; page-break-inside: avoid; }
     .swot-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; page-break-inside: avoid; }
     .swot-card { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 8px; padding: 10px 12px; page-break-inside: avoid; }
     .swot-label { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px solid #d0d8e8; }
-    .swot-item { font-size: 0.75rem; color: #2a3050; padding: 2px 0; border-bottom: 1px solid rgba(0,0,0,0.05); line-height: 1.4; }
+    .swot-item { font-size: 0.75rem; color: #1a1e2e; padding: 2px 0; border-bottom: 1px solid rgba(0,0,0,0.07); line-height: 1.4; }
     .swot-item:last-child { border: none; }
     .ind-row { display: flex; align-items: center; justify-content: space-between; background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 7px; padding: 7px 12px; margin-bottom: 4px; page-break-inside: avoid; }
     .ind-left { display: flex; align-items: center; gap: 7px; }
@@ -518,27 +518,29 @@ function downloadPDF() {
     .badge-bad { background: rgba(220,50,80,0.12); color: #cc2040; }
     .badge-warn { background: rgba(200,140,0,0.12); color: #cc8800; }
     .ind-name { font-size: 0.78rem; font-weight: 500; }
-    .ind-val { font-family: monospace; font-size: 0.7rem; color: #888; }
+    .ind-val { font-family: monospace; font-size: 0.7rem; color: #444; }
     .score-block { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; page-break-inside: avoid; }
     .score-num { font-size: 2.4rem; font-weight: 900; line-height: 1; min-width: 46px; text-align: center; }
     .score-info { flex: 1; }
+    .score-info strong { color: #1a1e2e !important; font-size: 0.82rem; }
+    .score-info div { color: #2a3050 !important; font-size: 0.74rem; line-height: 1.5; margin-top: 3px; }
     .score-bar-wrap { width: 100%; height: 4px; background: #d0d8e8; border-radius: 2px; margin-top: 8px; overflow: hidden; }
     .score-bar { height: 100%; border-radius: 2px; background: linear-gradient(90deg,#cc2040,#cc8800,#00a870); }
     .screening-box { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 8px; padding: 10px 14px; page-break-inside: avoid; }
     .screen-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.78rem; }
     .screen-row:last-child { border: none; }
-    .screen-label { color: #2a3050; flex: 1; }
+    .screen-label { color: #1a1e2e; flex: 1; font-weight: 500; }
     .screen-result { font-weight: 700; }
     .fair-value { margin-top: 8px; padding: 7px 10px; background: #eef2ff; border-radius: 6px; font-size: 0.72rem; color: #c9963a; }
     .add-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; page-break-inside: avoid; }
     .add-metric { background: #f4f6fb; border: 1px solid #d0d8e8; border-radius: 6px; padding: 6px 10px; page-break-inside: avoid; }
-    .add-metric-label { font-size: 0.52rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1px; }
-    .add-metric-val { font-size: 0.74rem; font-weight: 600; color: #1a1e2e; line-height: 1.3; }
+    .add-metric-label { font-size: 0.52rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1px; }
+    .add-metric-val { font-size: 0.74rem; font-weight: 600; color: #111827; line-height: 1.3; }
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; page-break-inside: avoid; }
     .verdict-box { background: #eef2ff; border: 1px solid #4080ff; border-radius: 10px; padding: 12px 16px; page-break-inside: avoid; }
     .verdict-title { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #c9963a; margin-bottom: 6px; }
-    .verdict-text { color: #2a3050; font-size: 0.8rem; line-height: 1.6; }
-    .disclaimer { text-align: center; color: #888; font-size: 0.6rem; margin-top: 14px; padding-top: 10px; border-top: 1px solid #d0d8e8; line-height: 1.5; }
+    .verdict-text { color: #1a1e2e; font-size: 0.8rem; line-height: 1.6; }
+    .disclaimer { text-align: center; color: #555; font-size: 0.6rem; margin-top: 14px; padding-top: 10px; border-top: 1px solid #d0d8e8; line-height: 1.5; }
     @page { margin: 10mm 8mm; size: A4; }
   `;
 
