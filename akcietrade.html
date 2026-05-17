@@ -24,6 +24,8 @@
   #pdf-report.pdf-light .pdf-logo { color: #1a1e2e !important; }
   #pdf-report.pdf-light .pdf-date { color: #5a6380 !important; }
   #pdf-report.pdf-light .company-badge { background: var(--pdf-surface2) !important; border-color: var(--pdf-border) !important; }
+  #pdf-report.pdf-light .company-badge .dot { background: #00a870 !important; }
+  #pdf-report.pdf-light .company-badge .ticker { color: #2060cc !important; }
   #pdf-report.pdf-light .sector-tag { color: #5a6380 !important; }
   #pdf-report.pdf-light .metric-card { background: var(--pdf-surface) !important; border-color: var(--pdf-border) !important; }
   #pdf-report.pdf-light .metric-label { color: #5a6380 !important; }
@@ -174,13 +176,43 @@
   /* PRINT */
   @media print {
     .no-print { display:none !important; }
-    body { background:#0b0d12; }
-    #pdf-report { max-width:100%; padding:10px 20px; }
+    body { background:#fff; }
+    #pdf-report { max-width:100%; padding:6px 16px; font-size:11px; }
     * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
-    @page { margin:10mm; size:A4; }
+    @page { margin:12mm 10mm; size:A4; }
     .swot-grid, .two-col { grid-template-columns:1fr 1fr; }
     .add-metrics { grid-template-columns:repeat(3,1fr); }
+    /* Prevent page breaks inside key elements */
+    .sec { page-break-inside:avoid; break-inside:avoid; }
+    .swot-card { page-break-inside:avoid; break-inside:avoid; }
+    .ind-row { page-break-inside:avoid; break-inside:avoid; }
+    .score-block { page-break-inside:avoid; break-inside:avoid; }
+    .verdict-box { page-break-inside:avoid; break-inside:avoid; }
+    .screening-box { page-break-inside:avoid; break-inside:avoid; }
+    .metric-card { page-break-inside:avoid; break-inside:avoid; }
+    .add-metric { page-break-inside:avoid; break-inside:avoid; }
+    /* Keep section title with content */
+    .sec-title { page-break-after:avoid; break-after:avoid; }
+    .swot-label { page-break-after:avoid; break-after:avoid; }
+    /* Reduce font sizes for PDF */
+    .box { font-size:0.78rem !important; line-height:1.5 !important; padding:10px 14px !important; }
+    .swot-item { font-size:0.75rem !important; }
+    .ind-name { font-size:0.78rem !important; }
+    .ind-val { font-size:0.72rem !important; }
+    .screen-row { font-size:0.78rem !important; }
+    .verdict-text { font-size:0.78rem !important; line-height:1.55 !important; }
+    .company-name { font-size:1.4rem !important; }
+    .sec-title { font-size:0.88rem !important; }
+    .score-num { font-size:2.4rem !important; }
+    .metric-val { font-size:0.78rem !important; }
+    .add-metric-val { font-size:0.75rem !important; }
+    .score-block { padding:12px 16px !important; }
+    .sec { margin-bottom:16px !important; }
+    .company-hdr { margin-bottom:16px !important; padding-bottom:14px !important; }
+    .fair-value { font-size:0.75rem !important; }
   }
+
+
 
   @media (max-width:600px) {
     .swot-grid, .two-col { grid-template-columns:1fr; }
@@ -285,6 +317,7 @@ function parseAndShow() {
     reportData = d;
     renderReport(d);
     showView('report');
+
   } catch(err) {
     errEl.textContent = '⚠️ ' + err.message;
     errEl.classList.remove('hidden');
@@ -354,9 +387,11 @@ function renderReport(d) {
 
     <!-- SWOT -->
     ${sec('SWOT Analýza', `
-      <div class="swot-grid">
+      <div class="swot-grid" style="page-break-inside:avoid">
         ${swotCard('Silné stránky', d.swot?.strengths, 'var(--accent2)')}
         ${swotCard('Slabé stránky', d.swot?.weaknesses, 'var(--danger)')}
+      </div>
+      <div class="swot-grid" style="margin-top:10px;page-break-inside:avoid">
         ${swotCard('Příležitosti', d.swot?.opportunities, 'var(--accent)')}
         ${swotCard('Hrozby', d.swot?.threats, 'var(--warn)')}
       </div>
@@ -448,12 +483,13 @@ function downloadPDF() {
 
   // Apply light theme for PDF
   el.classList.add('pdf-light');
+  // Hide interactive chart for PDF (use static placeholder)
 
   const opt = {
     margin: [10,10,10,10],
     filename: `analyza-${ticker}-${date}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+    html2canvas: { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', logging: false, removeContainer: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
